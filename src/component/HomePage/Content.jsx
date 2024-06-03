@@ -32,7 +32,14 @@ function Content() {
 
   const handleCreateCard = (e) => {
     e.preventDefault();
-    createBoard(boardName);
+    createBoard(boardName)
+      .then((data) => {
+        console.log(data);
+        setAllBoard((prevBoards) => [...prevBoards, data]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     setBoard("");
     handleClose();
@@ -46,7 +53,7 @@ function Content() {
       .catch((err) => {
         console.log(err);
       });
-  }, [boardName]);
+  }, []);
 
   const handleChange = (e) => {
     setBoard(e.target.value);
@@ -62,14 +69,19 @@ function Content() {
           pt: 4,
         }}
       >
-       
-          <Button
-            onClick={handleOpen}
-            variant="contained"
-            sx={{ backgroundColor: "#008080",borderRadius: 3, width: 200,m:4, height:100 }}
-          >
-            Create Card
-          </Button>
+        <Button
+          onClick={handleOpen}
+          variant="contained"
+          sx={{
+            backgroundColor: "#008080",
+            borderRadius: 3,
+            width: 200,
+            m: 4,
+            height: 100,
+          }}
+        >
+          Create Board
+        </Button>
 
         <Modal open={open} onClose={handleClose}>
           <Box sx={style}>
@@ -86,7 +98,6 @@ function Content() {
                 variant="outlined"
                 sx={{ mt: 2, borderRadius: 2 }}
                 color="secondary"
-                backgroundColor="#c2c2c2"
                 type="submit"
               >
                 Create

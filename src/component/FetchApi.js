@@ -42,6 +42,7 @@ export function createBoard(nameOfBoard){
      )
      .then((response) => {
        console.log(response.status, response.data);
+       return response.data;
      })
      .catch((error) => {
        console.error("There was an error creating the board!", error);
