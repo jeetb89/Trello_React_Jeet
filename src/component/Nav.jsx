@@ -8,9 +8,7 @@ import {
   MenuItem,
   Container,
   Button,
-  InputBase,
 } from "@mui/material";
-import { styled, alpha } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useState } from "react";
