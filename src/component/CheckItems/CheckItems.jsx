@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import {Box,Checkbox} from "@mui/material";
+import { Box, Checkbox } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import { changeItemCheckbox, deleteCheckItem } from "../FetchApi";
 
-function CheckItems({ checkItem, handleCheckChange, handleDeleteCheckItem, cardObj }) {
+function CheckItems({
+  checkItem,
+  handleCheckChange,
+  handleDeleteCheckItem,
+  cardObj,
+}) {
   const [checkedState, setCheckedState] = useState(null);
 
   useEffect(() => {
-    setCheckedState(checkItem.state === 'complete');
+    setCheckedState(checkItem.state === "complete");
   }, []);
-
-
 
   function handleDelete() {
     console.log(checkItem);
@@ -23,10 +26,9 @@ function CheckItems({ checkItem, handleCheckChange, handleDeleteCheckItem, cardO
       .catch((err) => console.log(err));
   }
 
-  
   function handleCheckChangeLocal() {
     const newCheckState = !checkedState;
-    const checkState = newCheckState ? 'complete' : 'incomplete';
+    const checkState = newCheckState ? "complete" : "incomplete";
     setCheckedState(newCheckState);
     changeItemCheckbox(cardObj.id, checkItem.id, checkState)
       .then(() => {
@@ -41,8 +43,9 @@ function CheckItems({ checkItem, handleCheckChange, handleDeleteCheckItem, cardO
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          width: "80%",
+          width: "100%",
           alignItems: "center",
+          fontFamily: "sans-serif",
         }}
       >
         <Box>

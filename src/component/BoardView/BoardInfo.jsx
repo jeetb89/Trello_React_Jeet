@@ -1,23 +1,12 @@
 import { useParams } from "react-router-dom";
 import React,{ useState, useEffect } from "react";
-import { FormControl, FormLabel, Modal,TextField,Box,Button} from "@mui/material";
+import {Box,Button} from "@mui/material";
 import { createLists,FetchApi  } from "../FetchApi";
 import Lists from '../ListView/Lists'
+import DialogBox from "../DialogBox";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 300,
-  bgcolor: "background.paper",
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 2,
-  display:'flex',
-  textAlign: 'center',
- justifyContent: 'center'
-};
+
+
 
 function BoardInfo() {
   const { id } = useParams();
@@ -63,18 +52,20 @@ function BoardInfo() {
 
   return (
     <>
-      <Box component="span"  sx={{display: 'flex',overflowX: 'auto', whiteSpace: 'nowrap'}} >
-        {lists.map((list) => (
-          <Lists key={list.id} handleListChange={listDisposed} listInfo={list} />
-        ))}
+      <Box component="span"  sx={{display: 'flex',overflowX:'scroll',height:'100vh'}} >
+        <Box sx={{display: 'flex'}}>
 
+        {lists.length>0 ?  (lists.map((list) => (
+          <Lists key={list.id} handleListChange={listDisposed} listInfo={list} />
+        ))):(<Box sx={{width:'10vw', m:2}}>Loading Lists...</Box>)   }
+   
         <Button
           onClick={handleOpen}
           variant="outlined"
           sx={{
             m: 2,
-            width: "20%",
-            height: "10%",
+            width: '20vw',
+            height:'10vh',
             color: "#ffff",
             backgroundColor: "#4682B4",
             border: "2px solid #f0f0f0",
@@ -83,29 +74,12 @@ function BoardInfo() {
         >
           + Add a List
         </Button>
+        </Box> 
       </Box>
+     
+      <DialogBox open={open} handleClose={handleClose} handleSubmit={handleFormSubmit}  textValue={listName} title='Create List' textChange={handleListName}/> 
 
-      <Modal open={open} onClose={handleClose}>
-        <Box sx={style}>
-          <FormControl component="form" onSubmit={handleFormSubmit}>
-            <FormLabel sx={{ mb: 2,fontWeight:'bold' }}>Create List</FormLabel>
-            <TextField
-              type="text"
-              value={listName}
-              onChange={handleListName}
-              variant="filled"
-              label="List Name"
-            />
-            <Button 
-            sx={{ mt: 2, borderRadius: 2 }}
-            color="secondary"
-            backgroundColor="#c2c2c2"
-            variant="outlined" type="submit">
-              Create
-            </Button>
-          </FormControl>
-        </Box>
-      </Modal>
+
     </>
   );
 }

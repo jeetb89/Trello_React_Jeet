@@ -9,18 +9,7 @@ import {
 } from "@mui/material";
 import Boards from "./Boards";
 import { getAllBoard, createBoard } from "../FetchApi";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 300,
-  bgcolor: "background.paper",
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 2,
-};
+import DialogBox from "../DialogBox";
 
 function Content() {
   const [open, setOpen] = useState(false);
@@ -30,7 +19,7 @@ function Content() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleCreateCard = (e) => {
+  const handleCreateBoard = (e) => {
     e.preventDefault();
     createBoard(boardName)
       .then((data) => {
@@ -67,6 +56,7 @@ function Content() {
           flexWrap: "wrap",
           m: 2,
           pt: 4,
+          fontFamily: "sans-serif",
         }}
       >
         <Button
@@ -83,32 +73,34 @@ function Content() {
           Create Board
         </Button>
 
-        <Modal open={open} onClose={handleClose}>
-          <Box sx={style}>
-            <FormControl component="form" onSubmit={handleCreateCard}>
-              <FormLabel sx={{ mb: 2 }}>Create Board</FormLabel>
-              <TextField
-                type="text"
-                value={boardName}
-                onChange={handleChange}
-                variant="filled"
-                label="Board Title"
-              />
-              <Button
-                variant="outlined"
-                sx={{ mt: 2, borderRadius: 2 }}
-                color="secondary"
-                type="submit"
-              >
-                Create
-              </Button>
-            </FormControl>
-          </Box>
-        </Modal>
+        <DialogBox
+          open={open}
+          handleClose={handleClose}
+          handleSubmit={handleCreateBoard}
+          textValue={boardName}
+          title="Create Board"
+          textChange={handleChange}
+        />
 
-        {allBoards.map((item) => (
-          <Boards key={item.id} boardInfo={item} />
-        ))}
+        {allBoards.length > 0 ? (
+          allBoards.map((item) => <Boards key={item.id} boardInfo={item} />)
+        ) : (
+          <Box
+            sx={{
+              backgroundColor: "#6495ED",
+              height: 100,
+              width: 200,
+              borderRadius: 2,
+              m: 4,
+              color: "#ffff",
+              alignContent: "center",
+              textAlign: "center",
+            }}
+          >
+            {" "}
+            Loading Boards...
+          </Box>
+        )}
       </Box>
     </>
   );

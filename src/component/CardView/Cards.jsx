@@ -1,14 +1,22 @@
 import React from "react";
-import {Button,styled,Box,Typography,Dialog,IconButton,DialogTitle,DialogContent,DialogActions,FormGroup } from "@mui/material";
+import {
+  Button,
+  styled,
+  Box,
+  Typography,
+  Dialog,
+  IconButton,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormGroup,
+} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
-import { deleteCard, getCheckList,createCheckList } from "../FetchApi";
+import { deleteCard, getCheckList, createCheckList } from "../FetchApi";
 import CheckList from "../CheckList/CheckList";
-import CheckListPopOver from "../CheckList/CheckListPopOver";
-
-
-
+import PopOver from "../PopOver";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -23,13 +31,41 @@ function Cards({ cardInfo, handleCards }) {
   const [delCard, setDelCard] = useState(false);
   const [checkLists, setAllCheckList] = useState([]);
   const [openChecklists, setOpenChecklists] = useState(false);
-  
-  
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [checkListName, setCheckListName] = useState("");
+
   useEffect(() => {
     getCheckList(cardInfo.id)
       .then((data) => setAllCheckList(data))
       .catch((err) => console.log(err));
   }, []);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCheckListBox = (e) => {
+    setCheckListName(e.target.value);
+  };
+
+  const handleCheckList = (e) => {
+    e.preventDefault();
+
+    createCheckList(cardInfo.id, checkListName)
+      .then((data) => {
+        handleNewCheckList(data);
+        setCheckListName("");
+        handleClose();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   const handleCheckListOpen = () => {
     setOpenChecklists(true);
@@ -37,7 +73,6 @@ function Cards({ cardInfo, handleCards }) {
   const handleCheckListClose = () => {
     setOpenChecklists(false);
   };
-
 
   const handleDelOpen = () => setDelCard(true);
   const handleDelClose = () => setDelCard(false);
@@ -49,19 +84,15 @@ function Cards({ cardInfo, handleCards }) {
     handleCards(id);
   };
 
+  const handleNewCheckList = (data) => {
+    setAllCheckList([...checkLists, data]);
+    console.log("reached");
+  };
 
-
-const handleNewCheckList=(data)=>{
-     setAllCheckList([...checkLists,data]);         
-     console.log('reached')
-}
-
-const handleDeleteCheckList=(id)=>{
-     const newCheckList =checkLists.filter((checkList)=>checkList.id!==id)
-     setAllCheckList(newCheckList);
-  
-}
- 
+  const handleDeleteCheckList = (id) => {
+    const newCheckList = checkLists.filter((checkList) => checkList.id !== id);
+    setAllCheckList(newCheckList);
+  };
 
   return (
     <>
@@ -82,9 +113,8 @@ const handleDeleteCheckList=(id)=>{
             pl: 2,
             width: "100%",
             cursor: "pointer",
-           
           }}
-          onClick={ handleCheckListOpen}
+          onClick={handleCheckListOpen}
         >
           {cardInfo.name}
         </Box>
@@ -92,8 +122,6 @@ const handleDeleteCheckList=(id)=>{
           <MoreVertIcon />
         </IconButton>
       </Box>
-
-
 
       <BootstrapDialog
         onClose={handleDelClose}
@@ -125,22 +153,22 @@ const handleDeleteCheckList=(id)=>{
         </DialogActions>
       </BootstrapDialog>
 
-
-
-
       <BootstrapDialog
-        onClose={handleCheckListClose }
+        onClose={handleCheckListClose}
         aria-labelledby="customized-dialog-title"
-        open={openChecklists} 
+        open={openChecklists}
       >
-        <DialogTitle sx={{ m: 0, p: 2,width:'38vw' }} id="customized-dialog-title">
-          Check List
+        <DialogTitle
+          sx={{ m: 0, p: 2, width: "38vw" }}
+          id="customized-dialog-title"
+        >
+          {cardInfo.name}
         </DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleCheckListClose }
+          onClick={handleCheckListClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -148,25 +176,44 @@ const handleDeleteCheckList=(id)=>{
         >
           <CloseIcon />
         </IconButton>
-          <DialogContent>
-          <FormGroup sx={{mt:1}}>
-         
-      <CheckListPopOver card={cardInfo} handleCheck={handleNewCheckList}/>
-           {
-              checkLists.map(checkList=>(
-                <CheckList key={checkList.id} cardObj={cardInfo}  handleCheckListDelete={handleDeleteCheckList} checkList={checkList}>
+        <DialogContent>
+          <FormGroup sx={{ mt: 1 }}>
+            <Button
+              variant="outlined"
+              aria-describedby={id}
+              onClick={handleClick}
+              sx={{
+                width: "70%",
+                alignSelf: "center",
+                height: "5%",
+                display: "inline-block",
+              }}
+            >
+              Add Checklist
+            </Button>
+            {/* <CheckListPopOver card={cardInfo} handleCheck={handleNewCheckList}/> */}
+            <PopOver
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              handleClose={handleClose}
+              label={"Name"}
+              handleNew={handleCheckList}
+              name={checkListName}
+              handleNewInput={handleCheckListBox}
+            />
 
-                </CheckList>
-              ))
-            }
-          
+            {checkLists.map((checkList) => (
+              <CheckList
+                key={checkList.id}
+                cardObj={cardInfo}
+                handleCheckListDelete={handleDeleteCheckList}
+                checkList={checkList}
+              />
+            ))}
           </FormGroup>
-           
-
-          </DialogContent>
-      
+        </DialogContent>
       </BootstrapDialog>
-
     </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import {
+  Button,
   Box,
   Typography,
   LinearProgress,
@@ -12,17 +13,18 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropTypes from "prop-types";
 import CheckItems from "../CheckItems/CheckItems";
-import CheckItemsPopOver from "../CheckItems/CheckItemsPopOver";
-import {
-  deleteCheckList,
-  getCheckItems
-} from "../FetchApi";
+import PopOver from "../PopOver";
+import { deleteCheckList, getCheckItems, createCheckItem } from "../FetchApi";
 
 function LinearProgressWithLabel(props) {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Box sx={{ width: "100%", mr: 1 }}>
-        <LinearProgress variant="determinate" sx={{height:'1.5vh', borderRadius:1}} {...props} />
+        <LinearProgress
+          variant="determinate"
+          sx={{ height: "1.5vh", borderRadius: 1 }}
+          {...props}
+        />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography variant="body2" color="text.secondary">{`${Math.round(
@@ -40,6 +42,8 @@ LinearProgressWithLabel.propTypes = {
 function CheckList({ handleCheckListDelete, checkList, cardObj }) {
   const [checkItems, setCheckItems] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [checkItemName, setCheckItemName] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     getCheckItems(checkList.id)
@@ -49,6 +53,33 @@ function CheckList({ handleCheckListDelete, checkList, cardObj }) {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCheckItemInput = (e) => {
+    setCheckItemName(e.target.value);
+  };
+
+  const handleCheckItem = (e) => {
+    e.preventDefault();
+
+    createCheckItem(checkList.id, checkItemName)
+      .then((data) => {
+        handleNewCheckItem(data);
+        setCheckItemName("");
+        handleClose();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   const updateProgress = (items) => {
     const totalCheckItems = items.length;
@@ -91,7 +122,15 @@ function CheckList({ handleCheckListDelete, checkList, cardObj }) {
 
   return (
     <>
-      <Box sx={{ border: "1px solid transparent",  backgroundColor:"#D3D3D3",borderRadius:3, mt: 2, p: 2 }}>
+      <Box
+        sx={{
+          border: "1px solid transparent",
+          backgroundColor: "#ffff",
+          borderRadius: 3,
+          mt: 2,
+          p: 2,
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -99,14 +138,12 @@ function CheckList({ handleCheckListDelete, checkList, cardObj }) {
             p: 1,
             m: 0,
             alignItems: "center",
-           
-
           }}
         >
           <FormGroup>
             <FormControlLabel
               disabled
-              control={<CheckBoxIcon/>}
+              control={<CheckBoxIcon />}
               label={checkList.name}
             />
           </FormGroup>
@@ -115,7 +152,7 @@ function CheckList({ handleCheckListDelete, checkList, cardObj }) {
           </IconButton>
         </Box>
         <Box sx={{ width: "90%", m: 2 }}>
-          <LinearProgressWithLabel  color="success" value={progress} />
+          <LinearProgressWithLabel color="success" value={progress} />
         </Box>
         <Box
           sx={{
@@ -133,9 +170,25 @@ function CheckList({ handleCheckListDelete, checkList, cardObj }) {
               handleDeleteCheckItem={handleDeleteCheckItem}
             />
           ))}
-          <CheckItemsPopOver
-            checkList={checkList}
-            handleCheck={handleNewCheckItem}
+
+          <Button
+            aria-describedby={id}
+            variant="outlined"
+            onClick={handleClick}
+            sx={{ width: "80%", mt: 2, height: "5%", display: "inline-block" }}
+          >
+            Add an Item
+          </Button>
+
+          <PopOver
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            handleClose={handleClose}
+            label={"CheckItem Name"}
+            handleNew={handleCheckItem}
+            name={checkItemName}
+            handleNewInput={handleCheckItemInput}
           />
         </Box>
       </Box>

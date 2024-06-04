@@ -12,7 +12,7 @@ function App() {
 
     <Nav/>
     <Routes>
-    <Route path="/" element={<Navigate to="/boards" />} />
+       <Route path="/" element={<Navigate to="/boards" />} />
       <Route path="/boards" element={<Content/>}/> 
 
       <Route path="/boards/:id"element={<BoardInfo/>}></Route>
